@@ -199,6 +199,8 @@ public class AudioPlayer: Node {
     // MARK: - Internal functions
 
     func internalCompletionHandler() {
+        if isSeeking { return }
+        if isPlaying { stop() }
         completionHandler?()
     }
 

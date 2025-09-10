@@ -106,16 +106,24 @@ public extension AudioPlayer {
             startingFrame: startFrame,
             frameCount: frameCount,
             at: nil,
-            completionCallbackType: .dataPlayedBack
-        ) { _ in
-            self.internalCompletionHandler()
-        }
+            completionCallbackType: .dataPlayedBack,
+            completionHandler: completedCallback)
 
         playerNode.play()
         status = .playing
         isSeeking = false
         timeBeforePlay = editStartTime - startTime
     }
+    
+    private func completedCallback(cb: AVAudioPlayerNodeCompletionCallbackType?) {
+        if isSeeking { return }
+        if Thread.isMainThread {
+            internalCompletionHandler()
+        } else {
+            DispatchQueue.main.async(qos: .userInteractive, execute: internalCompletionHandler)
+        }
+    }
+
 
     /// The current playback position, in range [0, 1].
     /// The start and end positions are 0 and 1, respectively.
