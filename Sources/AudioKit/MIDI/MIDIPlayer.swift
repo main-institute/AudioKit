@@ -4,7 +4,8 @@
 
 import AVFoundation
 
-extension AVAudioSequencer: Collection {
+extension AVAudioSequencer: @retroactive Sequence {}
+extension AVAudioSequencer: @retroactive Collection {
     /// This is a collection of AVMusicTracls, so we define element as such
     public typealias Element = AVMusicTrack
 
