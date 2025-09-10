@@ -59,7 +59,9 @@ struct AudioDeviceUtils {
 
         var name: CFString?
         var propsize: UInt32 = UInt32(MemoryLayout<CFString?>.size)
-        let result: OSStatus = AudioObjectGetPropertyData(device, &address, 0, nil, &propsize, &name)
+        let result: OSStatus = withUnsafeMutablePointer(to: &name) { pointertoName in
+                   return AudioObjectGetPropertyData(device, &address, 0, nil, &propsize, pointertoName)
+               }
         if result != 0 {
             return ""
         }
@@ -133,7 +135,9 @@ struct AudioDeviceUtils {
 
         var name: CFString?
         var propsize: UInt32 = UInt32(MemoryLayout<CFString?>.size)
-        let result: OSStatus = AudioObjectGetPropertyData(device, &address, 0, nil, &propsize, &name)
+        let result: OSStatus = withUnsafeMutablePointer(to: &name) { pointertoName in
+            return AudioObjectGetPropertyData(device, &address, 0, nil, &propsize, pointertoName)
+        }
         if result != 0 {
             return ""
         }
