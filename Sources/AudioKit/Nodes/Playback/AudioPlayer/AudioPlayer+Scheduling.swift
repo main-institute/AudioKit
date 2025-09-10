@@ -56,19 +56,20 @@ extension AudioPlayer {
                                    startingFrame: startFrame,
                                    frameCount: frameCount,
                                    at: audioTime,
-                                   completionCallbackType: completionCallbackType) { _ in
-            if self.isSeeking { return }
-            if Thread.isMainThread {
-                self.internalCompletionHandler()
-            } else {
-                DispatchQueue.main.async {
-                    self.internalCompletionHandler()
-                }
-            }
-        }
-
+                                   completionCallbackType: completionCallbackType,
+                                   completionHandler: completedCallback)
+        
         playerNode.prepare(withFrameCount: frameCount)
         status = .stopped
+    }
+    
+    private func completedCallback(cb: AVAudioPlayerNodeCompletionCallbackType?) {
+        if isSeeking { return }
+        if Thread.isMainThread {
+            internalCompletionHandler()
+        } else {
+            DispatchQueue.main.async(qos:.userInitiated, execute: internalCompletionHandler)
+        }
     }
 
     private func scheduleBuffer(at audioTime: AVAudioTime?,
@@ -94,17 +95,8 @@ extension AudioPlayer {
         playerNode.scheduleBuffer(buffer,
                                   at: audioTime,
                                   options: bufferOptions,
-                                  completionCallbackType: completionCallbackType) { _ in
-            if self.isSeeking { return }
-            if Thread.isMainThread {
-                self.internalCompletionHandler()
-            } else {
-                DispatchQueue.main.async {
-                    self.internalCompletionHandler()
-                }
-            }
-        }
-
+                                  completionCallbackType: completionCallbackType,
+                                  completionHandler: completedCallback)
         playerNode.prepare(withFrameCount: buffer.frameLength)
     }
 }
